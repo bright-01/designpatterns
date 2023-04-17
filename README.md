@@ -94,7 +94,45 @@
 > * static 필드는 클래스가 처음 로딩될 때 정적인 메모리 공간에 만들어짐
 > holder가 가지고 있는 클래스가 로딩되는 시점은 getInstance()를 호출할 때 로딩되기 때문에 lazy-initialization
 > * getInstance()를 호출하는 시점에 inner class인 SettingsHolder에 접근하게 되고, 이때 초기화가 수행되기 때문에 지연 초기화처럼 수행
-> * 
-
-
+> 
+> #### 싱글톤 패턴 구현을 깨뜨리는 방법 1 - 리플렉션
+> <pre><code>Settings settings = Settings.getInstance();
+> Constructor<Settings> declaredConstructor = Settings.class.getDeclaredConstructor();
+> declaredConstructor.setAccessible(true);
+> Settings settings1 = declaredConstructor.newInstance();
+> System.out.println(settings == settings1);</code></pre>
+> 1. 리플렉션에 대해 설명
+> * 구체적인 클래스의 타입을 몰라도 안에 선언되어 있는 함수, 변수들에 접근을 할 수 있는 자바의 API
+> 2. setAccessible(true)를 사용 하는 이유
+> * 기본생성자는 private.. -> 외부 호출 불가능 -> setAccessible(true)를 통해 Constructor<Settings5> 타입으로 받는 declaredConstructor,   
+> * 기본 생성자를 사용가능하게 해 newInstance()사용해새로운 객체를 만들 수 있게하기 때문
+> ### 싱글톤(Singleton) 패턴 구현을 깨뜨리는 방법 2 - 직렬화 & 역직렬화
+> <pre><code>Settings settings = Settings.getInstance();
+> Settings settings1 = null;
+> try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream("settings.obj"))) {
+> out.writeObject(settings);
+> }
+> try (ObjectInput in = new ObjectInputStream(new FileInputStream("settings.obj"))) {
+> settings1 = (Settings) in.readObject();
+> }
+> System.out.println(settings == settings1);</code></pre>
+> 1. 자바의 직렬화 & 역직렬화에 대해설명
+> * 직렬화 : 자바 시스템 내부에서 사용되는 Object 또는 Data를 외부의 자바 시스템에서도 사용할 수 있도록 byte형태로 변환.
+> * 역직렬화 : byte로 변환된 data를 원래대로 Object나 dat로 변환하는 기술 
+> 2. Serializableld란? 그 사용 이유?
+> * Srializable를 상속받는 경우 클래스의 버전관리를 위해 serialVersionUID를 사용한다.   
+>   이 serialVersionUID 변수를 명시적으로 선언해 주지 않으면 컴파일러가 계산한 값을 부여하는데 Serialzable Class 또는 Outer Class에 변경이 있으면 SerialVersionUID 값이 바뀌게 된다.   
+>   만약 Serialize 할 때와 Deserialize 할때 SerialVersionUID 값이 다르면 InvalidClassExceptions가 발생하고 저장된 값을 객체로 Restore 할 수 없다.
+> 3. try-resource 블럭에 대해 설명
+> * try-resource 블럭은 기존의 try-catch-final 블럭에서 사용하고 꼭 종료해줘야 하는 resource를 사용할 때 final 블럭에서 resource를 해제하는데, try-resource 블럭을 사용하면 따로 명시적으로 resource를 해제해주지 않아도 자동으로 해제해 준다
+> ### 싱글톤 패턴을 구현 하는 방법 6 - enum
+> <pre><code>public enum Settings {
+>    INSTANCE;
+> }</code></pre>
+> 1. enum 타입의 인스턴스를 리플렉션을 통해 만들 수 있는가?
+> * 없음. enum 타입은 리플렉션을 할 수 없도록 막혀있음
+> 2. enum으로 싱글톤 타입을 구현할 때의 단점은?
+> * 클래스가 메모리에 할당되는 시점에 인스턴스가 미리 만들어진다. 초기화 시점이 문제가 되지 않는다면 가장 안전한 방법
+> 3. 직렬화 & 역직렬화 시에 별도로 구현해야 하는 메소드가 있는가?
+> * enum 타입은 enum 클래스를 상속받는데, 이 클래스는 Serializable을 이미 구현하고 있기 때문에 추가적인 구현이 필요없다
 

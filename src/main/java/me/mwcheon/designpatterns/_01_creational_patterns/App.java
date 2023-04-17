@@ -44,6 +44,17 @@ public class App {
 
         // 대안은 ? 객체안에 readResolve를 통해 객체가 생성될때 getInstance를 호출 하도록 오버라이딩함
 
+        // 6. enum을 통한 싱글톤 구현
+        Settings6 settings6 = Settings6.INSTANCE;
+
+        Settings6 settings61 = null;
+        Constructor<?>[] declaredConstructors = Settings6.class.getDeclaredConstructors();
+        for (Constructor<?> constructors : declaredConstructors) {
+            constructors.setAccessible(true);
+            settings61 = (Settings6) constructors.newInstance("INSTANCE");
+        }
+        System.out.println(settings6 == settings61);
+
 
     }
 }
