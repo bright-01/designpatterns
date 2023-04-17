@@ -54,4 +54,8 @@ public class Settings {
         return SettingsHolder.INSTANCE;
 
     }
+
+    protected Object readResolve(){
+        return getInstance();
+    }
 }
