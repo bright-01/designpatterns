@@ -136,3 +136,23 @@
 > 3. 직렬화 & 역직렬화 시에 별도로 구현해야 하는 메소드가 있는가?
 > * enum 타입은 enum 클래스를 상속받는데, 이 클래스는 Serializable을 이미 구현하고 있기 때문에 추가적인 구현이 필요없다
 
+>  ### 싱글톤 (Singleton) 패턴 복습
+> 1. 자바에서 enum을 사용하지 않고 싱글톤 패턴을 구현하는 방법은?
+> * private 생성자에 static 메소드, 
+    synchronized 를 사용해 멀티쓰레드 환경에서 안전하게 만드는 방법, 
+    이른 초기화 ( eager initialization )을 사용하는 방법, 
+    double checked locking으로 효율적인 동기화 블럭 만들기, 
+    static inner 클래스를 사용하는 방법, 
+    싱글톤 패턴을 구현 하는 방법 6 - enum
+> 2. private 생성자와 static 메소드를 사용하는 방법의 단점은?
+>  * 동시성 문제
+> 3. enum을 사용해 싱글톤 패턴을 구현하는 방법의 장점과 단점은?
+>  * enum 타입은 리플렉션을 할 수 없도록 막혀있음, 클래스가 메모리에 할당되는 시점에 인스턴스가 미리 만들어진다.
+> 4. static inner 클래스를 사용해 싱글톤 패턴을 구현하라.
+> <pre><code>private Settings() {}
+> private static class SettingsHolder {
+>   private static final Settings SETTINGS = new Settings();
+> }
+> public static Settings getInstance() {
+>   return SettingsHolder.SETTINGS;
+> }</code></pre>
